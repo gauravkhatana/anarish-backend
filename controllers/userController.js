@@ -42,7 +42,7 @@ exports.saveUser = async (req, res) => {
     user.save();
 
     // Sending main to the new user who have asked for the query
-    sendEmail(
+     await sendEmail(
       email,
       "",
       "Welcome to Anarish Innovation - We are excited to Connect!",
