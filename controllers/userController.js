@@ -11,16 +11,16 @@ exports.saveUser = async (req, res) => {
    
 
   // Basic validation
-  if (
-    !name ||
-    !email ||
-    !phoneNumber ||
-    !intrests ||
-    !projectRequirements ||
-    !date
-  ) {
-    console.log( "Missing fields in the form")
-    return res.status(400).json({ error: "All fields are required." }); //send specific missing field error]
+  const missingFields = [];
+  if (!name) missingFields.push("name");
+  if (!email) missingFields.push("email");
+  if (!phoneNumber) missingFields.push("phoneNumber");
+  if (!intrests) missingFields.push("intrests");
+  if (!projectRequirements) missingFields.push("projectRequirements");
+  if (!date) missingFields.push("date");
+  
+  if (missingFields.length) {
+    return res.status(400).json({ error: `Missing fields: ${missingFields.join(", ")}` });
   }
 
   // Saving user in database
@@ -39,9 +39,7 @@ exports.saveUser = async (req, res) => {
 
     console.log("USER:::",user)
 
-    user.save();
-
-    // Sending main to the new user who have asked for the query
+    // Sending mail to the new user who have asked for the query
      await sendEmail(
       email,
       "",
@@ -55,8 +53,8 @@ exports.saveUser = async (req, res) => {
     `
     );
 
-    // Sending main to the anarish who have asked for the query
-    sendEmail(
+    // Sending mainlto the anarish of new user who have asked for the query
+   await sendEmail(
       "kumartech0102@gmail.com",
       "kumargorav2000@gmail.com",
       "New Query from Website",
@@ -69,6 +67,8 @@ exports.saveUser = async (req, res) => {
         <p><b>Message Shared:</b> ${projectRequirements}</p>
       `
     );
+
+    await user.save();
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
